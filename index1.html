@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Management System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+    --glass: rgba(255,255,255,0.15);
+    --border: rgba(255,255,255,0.3);
+    --text:#f9fafb;
+    --muted:#c7d2fe;
+    --primary:#818cf8;
+}
+*{
+    box-sizing:border-box;
+    font-family:Segoe UI, sans-serif;
+}
+body{
+    margin:0;
+    min-height:100vh;
+    background:radial-gradient(circle at top,#818cf8,#0f172a 60%);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:var(--text);
+}
+.app{
+    width:100%;
+    max-width:1100px;
+    padding:30px;
+}
+header{
+    text-align:center;
+    margin-bottom:40px;
+}
+header h1{
+    margin:0;
+    font-size:36px;
+}
+header p{
+    color:var(--muted);
+    margin-top:8px;
+}
+
+/* 🔥 FIXED PROFESSIONAL GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:25px;
+}
+
+/* Mobile */
+@media(max-width:768px){
+    .grid{
+        grid-template-columns:1fr;
+    }
+    header h1{font-size:26px;}
+}
+
+.card{
+    background:var(--glass);
+    backdrop-filter:blur(18px);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:22px;
+    box-shadow:0 30px 60px rgba(0,0,0,.35);
+    transition:transform .35s ease;
+}
+.card:hover{
+    transform:translateY(-5px);
+}
+.card h2{
+    margin-top:0;
+    font-size:22px;
+}
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.08);
+    color:var(--text);
+}
+input::placeholder{color:var(--muted);}
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(135deg,#818cf8,#a5b4fc);
+    color:#fff;
+    font-weight:600;
+    cursor:pointer;
+}
+button:hover{opacity:.9;}
+
+.student{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(255,255,255,.1);
+    padding:12px 14px;
+    border-radius:14px;
+    margin-bottom:10px;
+}
+.badge{
+    padding:4px 14px;
+    border-radius:20px;
+    background:linear-gradient(135deg,#818cf8,#a5b4fc);
+    font-size:13px;
+}
+.result{
+    margin-top:10px;
+    font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+<header>
+    <h1>Student Management System</h1>
+    <p>Glass UI • Persistent Records • Smart Search</p>
+</header>
+
+<div class="grid">
+
+<div class="card">
+    <h2>Add Student</h2>
+    <input id="name" placeholder="Student Name">
+    <input id="marks" type="number" placeholder="Marks">
+    <button onclick="addStudent()">Save Record</button>
+    <div class="result" id="msg"></div>
+</div>
+
+<div class="card">
+    <h2>All Students</h2>
+    <div id="list"></div>
+</div>
+
+<div class="card">
+    <h2>Search Student</h2>
+    <input id="search" placeholder="Enter name">
+    <button onclick="searchStudent()">Search</button>
+    <div class="result" id="searchResult"></div>
+</div>
+
+<div class="card">
+    <h2>Average Marks</h2>
+    <button onclick="average()">Calculate</button>
+    <div class="result" id="avg"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+let students = JSON.parse(localStorage.getItem("students")) || [];
+render();
+
+function addStudent(){
+    let name=document.getElementById("name").value.trim();
+    let marks=document.getElementById("marks").value;
+    if(!name||!marks){
+        document.getElementById("msg").innerText="Please fill all fields";
+        return;
+    }
+    students.push({name,marks:Number(marks)});
+    localStorage.setItem("students",JSON.stringify(students));
+    document.getElementById("name").value="";
+    document.getElementById("marks").value="";
+    document.getElementById("msg").innerText="Record saved";
+    render();
+}
+function render(){
+    let list=document.getElementById("list");
+    list.innerHTML="";
+    students.forEach(s=>{
+        list.innerHTML+=`
+        <div class="student">
+            <span>${s.name}</span>
+            <span class="badge">${s.marks}</span>
+        </div>`;
+    });
+}
+function searchStudent(){
+    let q=document.getElementById("search").value.toLowerCase();
+    let s=students.find(x=>x.name.toLowerCase()===q);
+    document.getElementById("searchResult").innerText=
+        s?`${s.name} scored ${s.marks} marks`:"Student not found";
+}
+function average(){
+    if(!students.length){
+        document.getElementById("avg").innerText="No data";
+        return;
+    }
+    let t=students.reduce((a,b)=>a+b.marks,0);
+    document.getElementById("avg").innerText=
+        "Average Marks: "+(t/students.length).toFixed(2);
+}
+</script>
+
+</body>
+</html>
